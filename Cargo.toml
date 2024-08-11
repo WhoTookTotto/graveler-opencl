@@ -6,3 +6,10 @@ edition = "2021"
 [dependencies]
 opencl3 = "0.9.5"
 rand = "0.8.5"
+
+[dev-dependencies]
+criterion = "0.5.1"
+
+[[bench]]
+name = "my_benchmarks"
+harness = false
