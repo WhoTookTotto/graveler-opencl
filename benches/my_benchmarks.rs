@@ -30,8 +30,6 @@ const PROGRAM_SOURCE: &str = r#"
         for (int i = 0; i < num_tries; i++) {
             uchar ones = 0;
 
-            // roll 8 ulong's writing each number into the rolls array
-
             for (int i = 0; i < 8; i++) {
                 ulong seed_x = seed.x + last_roll;
                 ulong t = seed_x ^ (seed_x << 11);
@@ -39,10 +37,6 @@ const PROGRAM_SOURCE: &str = r#"
 
                 last_roll = result;
 
-                // write the all the 64 bits of the result into the rolls array
-                // get pointer to the start of rolls array
-                // offset by 8 * i 
-                // write the result into the array
                 ulong* rolls_ptr = (ulong*)rolls;
                 rolls_ptr[i] = result;
             }
@@ -83,23 +77,18 @@ fn run() -> Result<()> {
 
     let max_work_group_size = device.max_work_group_size()?;
 
-    // Create a Context on an OpenCL device
     let context = Context::from_device(&device).expect("Context::from_device failed");
 
 
     let queue = CommandQueue::create_default(&context, CL_QUEUE_PROFILING_ENABLE)
         .expect("CommandQueue::create_default failed");
 
-
-    // Build the OpenCL program source and create the kernel.
     let program = Program::create_and_build_from_source(&context, PROGRAM_SOURCE, "")
         .expect("Program::create_and_build_from_source failed");
     let kernel = Kernel::create(&program, KERNEL_NAME).expect("Kernel::create failed");
 
     
-    let work_vec: Vec<usize> = {
-        // split the TOTAL_WORK_TO_DO between compute_units*max_work_group_size entries
-        
+    let work_vec: Vec<usize> = {        
         let mut output = vec![];
 
         let total_workers = compute_units as usize * max_work_group_size as usize;
@@ -117,12 +106,7 @@ fn run() -> Result<()> {
         }
 
         output
-    };
-
-    
-
-    // create a buffer to hold the seeds
-    
+    };    
 
     let seeds = gen_seeds(work_vec.len());
 
@@ -166,11 +150,7 @@ fn run() -> Result<()> {
     }
 
     let max_output = output.iter().max().unwrap();
-    
-
-
-    // start each compute unit with a different seed and give them the work to do
-    
+        
     Ok(())
 }
 
