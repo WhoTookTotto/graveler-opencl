@@ -14,6 +14,14 @@ use std::ptr;
 const TOTAL_WORK_TO_DO: usize = 1_000_000_000;
 
 const PROGRAM_SOURCE: &str = r#"
+    ulong gen_random_ulong(ulong2 seed, ulong last_roll) {
+        ulong seed_x = seed.x + last_roll;
+        ulong t = seed_x ^ (seed_x << 11);
+        ulong result = seed.y ^ (seed.y >> 19) ^ (t ^ (t >> 8));
+
+        return result;
+    }
+
     kernel void roll_dice(global ulong* output, global ulong2 const* seeds, global ulong const* work_to_do) {
         const size_t i = get_global_id(0);
 
@@ -27,25 +35,24 @@ const PROGRAM_SOURCE: &str = r#"
 
         ulong num_tries = work_to_do[i];
 
-        for (int i = 0; i < num_tries; i++) {
+        for (int j = 0; j < num_tries; j++) {
             uchar ones = 0;
 
-            for (int i = 0; i < 8; i++) {
-                ulong seed_x = seed.x + last_roll;
-                ulong t = seed_x ^ (seed_x << 11);
-                ulong result = seed.y ^ (seed.y >> 19) ^ (t ^ (t >> 8));
+            for (int k = 0; k < 8; k++) {
+                ulong result = gen_random_ulong(seed, last_roll);
 
                 last_roll = result;
 
                 ulong* rolls_ptr = (ulong*)rolls;
-                rolls_ptr[i] = result;
+                rolls_ptr[k] = result;
             }
 
-            for (int i = 0; i < 57; i++) {
-                ones += (rolls[i] & 0b00000011)==0;
-                ones += (rolls[i] & 0b00001100)==0;
-                ones += (rolls[i] & 0b00110000)==0;
-                ones += (rolls[i] & 0b11000000)==0;
+
+            for (int k = 0; k < 57; k++) {
+                ones += (rolls[k] & 0b00000011)==0;
+                ones += (rolls[k] & 0b00001100)==0;
+                ones += (rolls[k] & 0b00110000)==0;
+                ones += (rolls[k] & 0b11000000)==0;
             }
 
             ulong last_roll = rolls[57];
@@ -60,7 +67,6 @@ const PROGRAM_SOURCE: &str = r#"
 
         output[i] = max_seen;
     }
-
 "#;
 
 const KERNEL_NAME: &str = "roll_dice";
