@@ -14,3 +14,9 @@ using my geforce mx150 i get a benchmark time of 1.5s for 1b iterations
 
 will possibly get faster results using a better gpu but im not sure.
 this is my first time using opencl so i am not confident in my strategy of deviding work.
+
+### UPDATE
+
+running on a gtx 1080 ti gives about 200ms for 1b iterations
+
+![Image](https://github.com/user-attachments/assets/afc7a8ed-202f-4106-97b9-6156a6ae2d8b)
