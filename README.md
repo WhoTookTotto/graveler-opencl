@@ -20,3 +20,9 @@ this is my first time using opencl so i am not confident in my strategy of devid
 running on a gtx 1080 ti gives about 200ms for 1b iterations
 
 ![Image](https://github.com/user-attachments/assets/afc7a8ed-202f-4106-97b9-6156a6ae2d8b)
+
+seperating the build time of the OpenCL script and the execution gives me about 160ms (possibly a little bit less, if not for the overhead of actually measuring the time) for 1b iteration, showing there is quite some overhead with using OpenCL3 (https://github.com/kenba/opencl3) and it building the script within the executable.
+
+![image](https://github.com/user-attachments/assets/f0824643-4c79-4bdc-b0f2-dfdc83649c2e)
+
+
