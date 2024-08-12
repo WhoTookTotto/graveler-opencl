@@ -195,6 +195,8 @@ fn main() -> Result<()> {
 
     println!("average time: {}ms", average_time / TESTS as u128);
 
+    println!("max nums: {:?}", max_nums);
+
 
     
     Ok(())
