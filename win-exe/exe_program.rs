@@ -121,10 +121,12 @@ fn main() -> Result<()> {
 
     println!("running on: {:?}", device.name()?);
 
-    println!("finished building OpenCL program, running tests");
+    println!("finished building OpenCL program");
 
     let elapsed = time.elapsed();
     println!("building took {}ms", elapsed.as_millis());
+
+    println!("running {} tests", TESTS);
 
     let mut max_nums = vec![];
 
@@ -142,13 +144,11 @@ fn main() -> Result<()> {
             )?
         };
 
-        
         let output_buffer = unsafe {
             Buffer::<cl_ulong>::create(
                 &context, CL_MEM_WRITE_ONLY, work_vec.len() as usize, ptr::null_mut(),
             )?
         };
-
 
         let work_to_do_buffer = unsafe {
             Buffer::<cl_ulong>::create(
@@ -175,29 +175,17 @@ fn main() -> Result<()> {
             queue.enqueue_read_buffer(&output_buffer, CL_NON_BLOCKING, 0, &mut output, &events)?;    
         }
 
-        
-
-
         let max_output = output.iter().max().unwrap();
-        let sum_work = work_vec.iter().sum::<usize>();
 
         max_nums.push(*max_output);
 
-
-        let elapsed = time.elapsed();
-
-        println!("test {} took {}ms", i, elapsed.as_millis());
-
-
-        average_time += elapsed.as_millis();
+        average_time += time.elapsed().as_millis();
 
     }
 
     println!("average time: {}ms", average_time / TESTS as u128);
 
     println!("max nums: {:?}", max_nums);
-
-
     
     Ok(())
 }
